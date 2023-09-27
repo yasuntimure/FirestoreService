@@ -8,6 +8,8 @@ public protocol FirestoreServiceProtocol {
 
 public final class FirestoreService: FirestoreServiceProtocol {
 
+    public init() {}
+
     public func request<T>(_ type: T.Type, endpoint: FirestoreEndpoint) async throws -> [T] where T: FirestoreIdentifiable {
         switch endpoint.method {
         case .get:
