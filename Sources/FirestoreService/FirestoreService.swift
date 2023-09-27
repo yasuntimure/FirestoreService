@@ -35,9 +35,12 @@ public final class FirestoreService: FirestoreServiceProtocol {
             let querySnapshot = try await ref.getDocuments()
             var response: [T] = []
             for document in querySnapshot.documents {
-                if let data: T = document.data() as? T {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
+                    let decoder = JSONDecoder()
+                    let data = try decoder.decode(T.self, from: jsonData)
                     response.append(data)
-                } else {
+                } catch {
                     throw FirestoreServiceError.parseError
                 }
             }
