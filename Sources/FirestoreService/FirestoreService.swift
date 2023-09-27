@@ -35,20 +35,20 @@ public final class FirestoreService: FirestoreServiceProtocol {
             let querySnapshot = try await ref.getDocuments()
             var response: [T] = []
             for document in querySnapshot.documents {
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
-                    let decoder = JSONDecoder()
-                    let data = try decoder.decode(T.self, from: jsonData)
-                    response.append(data)
-                } catch {
-                    throw FirestoreServiceError.parseError
-                }
+                let data = try FirestoreParser.parse(document.data(), type: T.self)
+                response.append(data)
             }
             return response
         case .document(let documentReference):
-            guard let ref = documentReference, let singleResponse: T = try? await ref.getDocument() as? T else {
+            guard let ref = documentReference, let documentSnapshot = try? await ref.getDocument() else {
                 throw FirestoreServiceError.invalidPath
             }
+
+            guard let documentData = documentSnapshot.data() else {
+                throw FirestoreServiceError.parseError
+            }
+
+            let singleResponse = try FirestoreParser.parse(documentData, type: T.self)
             return [singleResponse]
         }
     }
