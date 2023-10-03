@@ -54,7 +54,7 @@ public final class FirestoreService: FirestoreServiceProtocol {
     }
 
     private func handleSet<T: FirestoreIdentifiable>(_ type: T.Type, endpoint: FirestoreEndpoint) async throws {
-        guard case let .updateDocument(value) = endpoint.task, var model = value as? T else {
+        guard case let .setDocument(value) = endpoint.task, var model = value as? T else {
             throw FirestoreServiceError.invalidType
         }
 

@@ -36,6 +36,5 @@ public enum FirestoreMethod {
 
 public enum FirestoreRequestPayload {
     case requestPlain
-    case createDocument(any FirestoreIdentifiable)
-    case updateDocument(any FirestoreIdentifiable)
+    case setDocument(any FirestoreIdentifiable)
 }
