@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  FirestoreEndpoint.swift
+//
 //
 //  Created by Eyüp on 2023-09-27.
 //
@@ -9,32 +9,40 @@ import FirebaseFirestore
 
 // MARK: - FirestoreEndpoint
 
+public typealias FirestoreQuery = Query
+
 public protocol FirestoreEndpoint {
-    var userID: String { get }
-    var path: FirestorePath { get }
+    var path: FirestoreReference { get }
     var method: FirestoreMethod { get }
-    var task: FirestoreRequestPayload { get }
+    var firestore: Firestore { get }
+}
+
+public extension FirestoreEndpoint {
+    var firestore: Firestore {
+        Firestore.firestore()
+    }
 }
 
 // MARK: - FirestorePath
 
 public enum FirestorePath {
-    case collection(CollectionReference?)
-    case document(DocumentReference?)
+    case collection(reference: CollectionReference)
+    case document(reference: DocumentReference)
 }
 
 // MARK: - FirestoreMethod
 
 public enum FirestoreMethod {
     case get
-    case post
-    case put
+    case post(any FirestoreIdentifiable)
+    case put(any FirestoreIdentifiable)
     case delete
 }
 
-// MARK: - FirestoreRequestPayload
 
-public enum FirestoreRequestPayload {
-    case requestPlain
-    case setDocument(any FirestoreIdentifiable)
+public protocol FirestoreReference {
+    // You can define common methods/properties here, if needed
 }
+
+extension DocumentReference: FirestoreReference { }
+extension CollectionReference: FirestoreReference { }
