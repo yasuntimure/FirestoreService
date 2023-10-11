@@ -24,68 +24,40 @@ After importing the package into your project:
 ```swift
 import FirestoreService
 
-public enum ExampleEndpoint: FirestoreEndpoint {
+public enum TestEndpoint: FirestoreEndpoint {
+    
+    case getItems
+    case postItem(dto: TestItem)
 
-    case exampleList
-    case saveExample(value: [YOUR MODEL])
-
-    public var userID: String {
-        "[YOUR User ID]"
-    }
-
-    public var path: FirestorePath {
-        let db = Firestore.firestore()
+    public var path: FirestoreReference {
         switch self {
-        case .exampleList:
-            return .collection(db.collection("XXXX").document(userID).collection("XXXX"))
-        case .saveExample(let value):
-            return .document(db.collection("XXXX").document(userID).collection("XXXX").document(value.id))
+        case .getItems:
+            return firestore.collection("items")
+        case .postItem(let dto):
+            return firestore.collection("items").document(dto.id)
         }
     }
 
     public var method: FirestoreMethod {
         switch self {
-        case .exampleList:
+        case .getItems:
             return .get
-        case .saveExample:
-            return .post
-        }
-    }
-
-    public var task: FirestoreRequestPayload {
-        switch self {
-        case .exampleList:
-            return .requestPlain
-        case .saveExample(let value):
-            return .createDocument(value)
+        case .postItem(let dto):
+            return .post(dto)
         }
     }
 }
+```
 
-protocol ExampleRepositoryProtocol {
-    func exampleList() async throws -> [YOUR MODEL]
-    func saveExample(_ value: [YOUR MODEL]) async throws
+### Request Collection or Document
+
+```swift
+Task {
+    do {
+        let endpoint = TestEndpoint.getItems
+        self.items = try await FirestoreService.requestCollection(TestItem.self, endpoint: endpoint)
+    } catch {
+        print("Error: ", error.localizedDescription)
+    }
 }
-
-struct ExampleRepository: ExampleRepositoryProtocol {
-
-    let service: FirestoreServiceProtocol
-
-    init(service: FirestoreServiceProtocol = FirestoreService()) {
-        self.service = service
-    }
-
-    func exampleList() async throws -> [NoteModel] {
-        let endpoint = ExampleEndpoint.exampleList
-        return try await service.request([YOUR MODEL].self, endpoint: endpoint)
-    }
-
-    func saveExample(_ value [YOUR MODEL]) async throws {
-        let endpoint = ExampleEndpoint.saveExample(value: value)
-        let _ = try await service.request([YOUR MODEL].self, endpoint: endpoint)
-    }
-
-}
-
-
-
+```
