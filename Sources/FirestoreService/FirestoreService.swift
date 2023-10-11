@@ -28,17 +28,11 @@ public final class FirestoreService: FirestoreServiceProtocol {
             let singleResponse = try FirestoreParser.parse(documentData, type: T.self)
             return singleResponse
 
-        case .post, .put:
-            guard case let .post(value) = endpoint.method, var model = value as? T else {
-                throw FirestoreServiceError.invalidType
-            }
-            switch endpoint.method {
-            case .post:
-                model.id = ref.documentID
-                try await ref.setData(model.asDictionary())
-            default:
-                try await ref.setData(model.asDictionary())
-            }
+        case .post(var model):
+            model.id = ref.documentID
+            try await ref.setData(model.asDictionary())
+        case .put(let model):
+            try await ref.setData(model.asDictionary())
         case .delete:
             try await ref.delete()
         }
