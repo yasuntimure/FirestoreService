@@ -55,7 +55,7 @@ public enum TestEndpoint: FirestoreEndpoint {
 Task {
     do {
         let endpoint = TestEndpoint.getItems
-        self.items = try await FirestoreService.requestCollection(TestItem.self, endpoint: endpoint)
+        self.items = try await FirestoreService.request(endpoint)
     } catch {
         print("Error: ", error.localizedDescription)
     }
