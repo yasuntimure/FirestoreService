@@ -34,8 +34,9 @@ struct ContentView: View {
 
     func fetchItems() {
         Task {
-            let result = try? await FirestoreService.requestCollection(TestItem.self, endpoint: TestEndpoint.getItems)
-            self.items = result ?? []
+            let endpoint = TestEndpoint.getItems
+            let result: [TestItem] = try await FirestoreService.request(endpoint)
+            self.items = result
         }
     }
 
@@ -43,7 +44,7 @@ struct ContentView: View {
         Task {
             let item = TestItem(title: "Test Item")
             let endpoint = TestEndpoint.postItem(dto: item)
-            _ = try? await FirestoreService.requestDocument(TestItem.self, endpoint: endpoint)
+            try? await FirestoreService.request(endpoint)
             self.fetchItems()
         }
     }
